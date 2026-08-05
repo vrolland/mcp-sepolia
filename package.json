@@ -1,0 +1,32 @@
+{
+  "name": "mcp-sepolia",
+  "version": "1.0.0",
+  "description": "MCP server that pays a Request Network Secure Payment token on Ethereum Sepolia",
+  "type": "module",
+  "main": "build/index.js",
+  "bin": {
+    "mcp-sepolia": "./build/index.js"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc && chmod 755 build/index.js",
+    "start": "node build/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "request-network",
+    "sepolia"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "viem": "2.45.3",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "25.9.1",
+    "typescript": "6.0.3"
+  }
+}

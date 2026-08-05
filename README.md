@@ -26,7 +26,7 @@ Flow:
 
 `GET /v2/secure-payments/:token/pay` is scoped to the credentials that **created** the Secure Payment. Using another account’s Client ID returns **401**, even if you have the token.
 
-Use the **same** `RN_CLIENT_ID` (or API key) as `mcp-request-network` / the merchant that created the link — not a separate “payer” Client ID.
+Use the **same** Client ID (or API key) as `mcp-request-network` / the merchant that created the link — not a separate “payer” Client ID.
 
 ## Install
 
@@ -37,28 +37,61 @@ npm run build
 
 ## Environment
 
-Create `.env` in this directory (or pass via mcp.json `env`):
+Server `.env` (loaded by the process):
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
-| `MNEMONIC` | yes | BIP-39 phrase — first address is the payer wallet |
-| `RN_CLIENT_ID` | one of | Client ID that **created** the Secure Payment (`x-client-id`) |
-| `RN_API_KEY` | one of | API key of the same account that created the payment |
+| `MNEMONIC` | yes | BIP-39 phrase — first address is the payer wallet (**server-only**, never in HTTP headers) |
+| `RN_CLIENT_ID` | one of\* | Client ID that created the Secure Payment |
+| `RN_API_KEY` | one of\* | API key of the same account that created the payment |
 | `SEPOLIA_RPC_URL` | no | Sepolia RPC (default: publicnode) |
 | `RN_API_BASE` | no | API base (default: `https://api.stage.request.network`) |
+| `MCP_HTTP_PORT` | no | HTTP port (default `3101`) |
+
+\* For HTTP mode, prefer passing Client ID / API key via mcp.json `headers` instead of the server `.env`.
 
 Example `.env`:
 
 ```env
 MNEMONIC="test test test test test test test test test test test junk"
-RN_CLIENT_ID=cli_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# RN_CLIENT_ID=cli_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 # RN_API_BASE=https://api.request.network
 # SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+# MCP_HTTP_PORT=3101
 ```
 
 Never commit `.env` or share the mnemonic.
 
-## Cursor / Claude Desktop (stdio)
+## Run modes
+
+### HTTP
+
+Starts a Streamable HTTP MCP endpoint on port `3101` (override with `MCP_HTTP_PORT`).
+
+```bash
+npm run mcp:http
+```
+
+Configure the MCP client with the URL and per-client headers (not the mnemonic):
+
+```json
+{
+  "mcpServers": {
+    "mcp-sepolia-http": {
+      "url": "http://localhost:3101/mcp",
+      "headers": {
+        "x-client-id": "cli_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    }
+  }
+}
+```
+
+- `x-client-id` — Request Network Client ID that **created** the Secure Payment
+- `x-api-key` — alternative to Client ID
+- `MNEMONIC` stays in the **server** `.env`
+
+### Stdio
 
 ```json
 {
@@ -96,5 +129,5 @@ pay_secure_payment token=https://pay.request.network/?token=01KJRA0M9QG8MA4X8879
 ## Security
 
 - Testnet only by design (hardcoded Sepolia chain).
-- The mnemonic can spend funds on that wallet — treat it as a secret.
+- The mnemonic can spend funds on that wallet — treat it as a secret; keep it in the server `.env`, never in client headers.
 - Prefer a dedicated throwaway Sepolia mnemonic, not a mainnet seed.

@@ -14,13 +14,23 @@ export type PayCalldataResult = {
   metadata?: Record<string, unknown>;
 };
 
+/** Per-client RN auth (HTTP headers or stdio env). Not the MNEMONIC. */
+export type SepoliaClientConfig = {
+  clientId?: string;
+  apiKey?: string;
+};
+
 function apiBase(): string {
   return process.env.RN_API_BASE?.trim() || DEFAULT_API_BASE;
 }
 
-function buildAuthHeaders(): Record<string, string> {
-  const apiKey = process.env.RN_API_KEY?.trim();
-  const clientId = process.env.RN_CLIENT_ID?.trim();
+function buildAuthHeaders(
+  clientConfig: SepoliaClientConfig = {},
+): Record<string, string> {
+  const apiKey =
+    clientConfig.apiKey?.trim() || process.env.RN_API_KEY?.trim();
+  const clientId =
+    clientConfig.clientId?.trim() || process.env.RN_CLIENT_ID?.trim();
 
   if (apiKey) {
     return { "x-api-key": apiKey };
@@ -29,7 +39,7 @@ function buildAuthHeaders(): Record<string, string> {
     return { "x-client-id": clientId };
   }
   throw new Error(
-    "Missing Request Network auth — set RN_CLIENT_ID or RN_API_KEY in env.",
+    'Missing Request Network auth — set headers["x-client-id"] (or x-api-key) in mcp.json for HTTP, or RN_CLIENT_ID / RN_API_KEY in env for stdio.',
   );
 }
 
@@ -146,6 +156,7 @@ export function normalizePayResponse(data: unknown): PayCalldataResult {
 export async function fetchPayCalldata(params: {
   token: string;
   wallet: string;
+  clientConfig?: SepoliaClientConfig;
 }): Promise<PayCalldataResult> {
   const token = extractSecurePaymentToken(params.token);
   const qs = new URLSearchParams({ wallet: params.wallet });
@@ -155,8 +166,8 @@ export async function fetchPayCalldata(params: {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Origin": "https://pay.stage.request.network",
-      ...buildAuthHeaders(),
+      Origin: "https://pay.stage.request.network",
+      ...buildAuthHeaders(params.clientConfig),
     },
   });
 
@@ -171,7 +182,7 @@ export async function fetchPayCalldata(params: {
   if (!response.ok) {
     const hint =
       response.status === 401
-        ? " — RN_CLIENT_ID / RN_API_KEY must be the same credentials that created this Secure Payment (another Client ID is rejected even with a valid token)."
+        ? " — Client ID / API key must be the same credentials that created this Secure Payment (another Client ID is rejected even with a valid token)."
         : "";
     throw new Error(
       `Request Network GET ${path} failed (${response.status}): ${text.slice(0, 800)}${hint}`,

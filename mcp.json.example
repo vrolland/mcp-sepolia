@@ -1,6 +1,12 @@
 {
   "mcpServers": {
-    "mcp-sepolia": {
+    "mcp-sepolia-http": {
+      "url": "http://localhost:3101/mcp",
+      "headers": {
+        "x-client-id": "cli_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    },
+    "mcp-sepolia-stdio": {
       "command": "node",
       "args": ["/absolute/path/to/mcp-sepolia/build/index.js"],
       "env": {

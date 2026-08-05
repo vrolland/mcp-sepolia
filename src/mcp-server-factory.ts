@@ -2,13 +2,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { Hex } from "viem";
 
-import {
-  fetchPayCalldata,
-  type SepoliaClientConfig,
-} from "./request-network.js";
+import { fetchPayCalldata } from "./request-network.js";
 import { createSepoliaWalletFromEnv, type SepoliaWallet } from "./wallet.js";
-
-export type { SepoliaClientConfig };
 
 const MCP_SERVER_INSTRUCTIONS = `# Sepolia Request Network payer MCP
 
@@ -19,12 +14,11 @@ Flow:
 2. MCP calls GET /v2/secure-payments/:token/pay with the wallet address
 3. MCP signs and broadcasts each returned transaction on Ethereum Sepolia
 
-Required: MNEMONIC in the MCP server .env (never via HTTP headers).
-Auth: RN_CLIENT_ID or RN_API_KEY — via mcp.json headers (HTTP) or env (stdio).
-Optional: SEPOLIA_RPC_URL, RN_API_BASE (default staging API).
+Required: MNEMONIC and RN_CLIENT_ID in the MCP server .env (never via mcp.json headers).
+Optional: SEPOLIA_RPC_URL, RN_API_BASE (default staging API), RN_API_KEY.
 
-Auth: Client ID / API key must belong to the same Request Network account that
-created the Secure Payment. A different Client ID (e.g. payer vs merchant) gets HTTP 401
+Auth: RN_CLIENT_ID must belong to the same Request Network account that
+created the Secure Payment. A different Client ID gets HTTP 401
 on GET /v2/secure-payments/:token/pay — having the token alone is not enough.
 `;
 
@@ -68,9 +62,7 @@ async function broadcastCalldata(
   return { hashes, receipts };
 }
 
-export function createSepoliaPayMcpServer(
-  clientConfig: SepoliaClientConfig = {},
-): McpServer {
+export function createSepoliaPayMcpServer(): McpServer {
   const server = new McpServer(
     {
       name: "mcp-sepolia",
@@ -136,7 +128,6 @@ export function createSepoliaPayMcpServer(
         const pay = await fetchPayCalldata({
           token,
           wallet: wallet.address,
-          clientConfig,
         });
 
         if (pay.metadata?.hasEnoughBalance === false) {

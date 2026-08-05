@@ -8,10 +8,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { InMemoryEventStore } from "@modelcontextprotocol/sdk/examples/shared/inMemoryEventStore.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-import {
-  createSepoliaPayMcpServer,
-  type SepoliaClientConfig,
-} from "./mcp-server-factory.js";
+import { createSepoliaPayMcpServer } from "./mcp-server-factory.js";
 
 /** Default 3101 so it can run alongside mcp-request-network (3100). */
 const DEFAULT_PORT = 3101;
@@ -19,7 +16,6 @@ const DEFAULT_PORT = 3101;
 type SessionEntry = {
   transport: StreamableHTTPServerTransport;
   server: McpServer;
-  clientConfig: SepoliaClientConfig;
 };
 
 const sessions = new Map<string, SessionEntry>();
@@ -27,52 +23,22 @@ const eventStore = new InMemoryEventStore();
 
 const app = createMcpExpressApp();
 
-function headerValue(req: Request, name: string): string | undefined {
-  const raw = req.headers[name.toLowerCase()];
-  if (typeof raw === "string") {
-    const trimmed = raw.trim();
-    return trimmed || undefined;
-  }
-  if (Array.isArray(raw)) {
-    const first = raw[0]?.trim();
-    return first || undefined;
-  }
-  return undefined;
-}
-
-/** RN credentials from mcp.json `headers` (not MNEMONIC — that stays in server .env). */
-function clientConfigFromRequest(req: Request): SepoliaClientConfig {
-  return {
-    clientId: headerValue(req, "x-client-id"),
-    apiKey: headerValue(req, "x-api-key"),
-  };
-}
-
-function mergeClientConfig(
-  target: SepoliaClientConfig,
-  source: SepoliaClientConfig,
-): void {
-  if (source.clientId) target.clientId = source.clientId;
-  if (source.apiKey) target.apiKey = source.apiKey;
-}
-
 app.all("/mcp", async (req: Request, res: Response) => {
   const sessionHeader = req.headers["mcp-session-id"];
   const existingId =
     typeof sessionHeader === "string" ? sessionHeader : undefined;
 
   let entry = existingId ? sessions.get(existingId) : undefined;
-  const incomingConfig = clientConfigFromRequest(req);
 
   if (!entry) {
-    const clientConfig: SepoliaClientConfig = { ...incomingConfig };
-    const server = createSepoliaPayMcpServer(clientConfig);
+    // RN_CLIENT_ID / MNEMONIC come from the server .env only — not from mcp.json headers.
+    const server = createSepoliaPayMcpServer();
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
       eventStore,
       retryInterval: 2000,
       onsessioninitialized: (sessionId) => {
-        sessions.set(sessionId, { transport, server, clientConfig });
+        sessions.set(sessionId, { transport, server });
         console.error(`[mcp-http] session ${sessionId} ready`);
 
         transport.onclose = () => {
@@ -83,9 +49,7 @@ app.all("/mcp", async (req: Request, res: Response) => {
     });
 
     await server.connect(transport);
-    entry = { transport, server, clientConfig };
-  } else {
-    mergeClientConfig(entry.clientConfig, incomingConfig);
+    entry = { transport, server };
   }
 
   try {
@@ -105,6 +69,8 @@ app.all("/mcp", async (req: Request, res: Response) => {
 const port = Number(process.env.MCP_HTTP_PORT) || DEFAULT_PORT;
 
 app.listen(port, () => {
+  const clientId = process.env.RN_CLIENT_ID?.trim() || "(missing RN_CLIENT_ID)";
   console.error(`mcp-sepolia (HTTP) — http://127.0.0.1:${port}/mcp`);
+  console.error(`RN_CLIENT_ID (server .env): ${clientId}`);
   console.error("Listening...");
 });

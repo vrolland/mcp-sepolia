@@ -6,11 +6,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { createSepoliaPayMcpServer } from "./mcp-server-factory.js";
 
 async function main() {
-  // Stdio: client supplies RN auth via mcp.json `env` (or server .env).
-  const server = createSepoliaPayMcpServer({
-    clientId: process.env.RN_CLIENT_ID?.trim() || undefined,
-    apiKey: process.env.RN_API_KEY?.trim() || undefined,
-  });
+  // Auth + wallet come from the server .env only.
+  const server = createSepoliaPayMcpServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error("mcp-sepolia running on stdio");

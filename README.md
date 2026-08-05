@@ -42,8 +42,7 @@ Server `.env` (loaded by the process):
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `MNEMONIC` | yes | BIP-39 phrase — first address is the payer wallet (**server-only**, never in HTTP headers) |
-| `RN_CLIENT_ID` | one of\* | Client ID that created the Secure Payment |
-| `RN_API_KEY` | one of\* | API key of the same account that created the payment |
+| `RN_CLIENT_ID` | for http | Client ID that created the Secure Payment |
 | `SEPOLIA_RPC_URL` | no | Sepolia RPC (default: publicnode) |
 | `RN_API_BASE` | no | API base (default: `https://api.stage.request.network`) |
 | `MCP_HTTP_PORT` | no | HTTP port (default `3101`) |

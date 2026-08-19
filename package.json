@@ -23,6 +23,8 @@
   "license": "ISC",
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",
+    "@turnkey/sdk-server": "^8.2.1",
+    "@turnkey/viem": "^0.14.36",
     "viem": "2.45.3",
     "zod": "3.25.76"
   },

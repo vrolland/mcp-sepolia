@@ -79,7 +79,7 @@ export function createSepoliaPayMcpServer(): McpServer {
     {},
     async () => {
       try {
-        const wallet = createSepoliaWalletFromEnv();
+        const wallet = await createSepoliaWalletFromEnv();
         const balance = await wallet.publicClient.getBalance({
           address: wallet.address,
         });
@@ -124,7 +124,7 @@ export function createSepoliaPayMcpServer(): McpServer {
     },
     async ({ token }) => {
       try {
-        const wallet = createSepoliaWalletFromEnv();
+        const wallet = await createSepoliaWalletFromEnv();
         const pay = await fetchPayCalldata({
           token,
           wallet: wallet.address,

@@ -1,0 +1,89 @@
+{
+  "manifest_version": "0.2",
+  "name": "mcp-sepolia",
+  "version": "1.0.0",
+  "description": "Pays un Secure Payment Request Network sur Ethereum Sepolia (mnemonic local ou signeur distant Turnkey)",
+  "author": {
+    "name": "vrolland"
+  },
+  "icon": "icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "build/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/build/index.js"],
+      "env": {
+        "MNEMONIC": "${user_config.mnemonic}",
+        "TURNKEY_API_PUBLIC_KEY": "${user_config.turnkey_api_public_key}",
+        "TURNKEY_API_PRIVATE_KEY": "${user_config.turnkey_api_private_key}",
+        "TURNKEY_ORGANIZATION_ID": "${user_config.turnkey_organization_id}",
+        "TURNKEY_SIGN_WITH": "${user_config.turnkey_sign_with}",
+        "TURNKEY_API_BASE_URL": "${user_config.turnkey_api_base_url}",
+        "RN_CLIENT_ID": "${user_config.rn_client_id}",
+        "RN_API_BASE": "${user_config.rn_api_base}",
+        "SEPOLIA_RPC_URL": "${user_config.sepolia_rpc_url}"
+      }
+    }
+  },
+  "user_config": {
+    "mnemonic": {
+      "type": "string",
+      "title": "Mnemonic (BIP-39)",
+      "description": "Phrase de 12/24 mots du wallet Sepolia. Laisser vide si vous utilisez Turnkey ci-dessous. Utilisez un mnemonic dédié testnet, jamais une seed mainnet.",
+      "sensitive": true,
+      "required": false
+    },
+    "turnkey_api_public_key": {
+      "type": "string",
+      "title": "Turnkey API Public Key",
+      "description": "Active le signeur distant Turnkey (prioritaire sur le mnemonic) quand renseigné.",
+      "required": false
+    },
+    "turnkey_api_private_key": {
+      "type": "string",
+      "title": "Turnkey API Private Key",
+      "description": "Clé privée de l'API key Turnkey associée à la clé publique ci-dessus.",
+      "sensitive": true,
+      "required": false
+    },
+    "turnkey_organization_id": {
+      "type": "string",
+      "title": "Turnkey Organization ID",
+      "description": "Organisation (ou sub-organization) Turnkey propriétaire du wallet de signature.",
+      "required": false
+    },
+    "turnkey_sign_with": {
+      "type": "string",
+      "title": "Turnkey Sign With",
+      "description": "Adresse du wallet, private key ID, ou wallet account ID à utiliser pour signer.",
+      "required": false
+    },
+    "turnkey_api_base_url": {
+      "type": "string",
+      "title": "Turnkey API Base URL",
+      "description": "Optionnel, défaut: https://api.turnkey.com",
+      "required": false
+    },
+    "rn_client_id": {
+      "type": "string",
+      "title": "Request Network Client ID",
+      "description": "Client ID ayant créé le Secure Payment à payer.",
+      "sensitive": true,
+      "required": true
+    },
+    "rn_api_base": {
+      "type": "string",
+      "title": "Request Network API Base",
+      "description": "Optionnel, défaut: https://api.stage.request.network",
+      "required": false
+    },
+    "sepolia_rpc_url": {
+      "type": "string",
+      "title": "Sepolia RPC URL",
+      "description": "Optionnel, défaut: https://ethereum-sepolia-rpc.publicnode.com",
+      "required": false
+    }
+  },
+  "license": "ISC"
+}

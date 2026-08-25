@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "mcp-sepolia",
   "version": "1.0.0",
-  "description": "Pays un Secure Payment Request Network sur Ethereum Sepolia (mnemonic local ou signeur distant Turnkey)",
+  "description": "Pays a Request Network Secure Payment on Ethereum Sepolia (local mnemonic or remote Turnkey signer)",
   "author": {
     "name": "vrolland"
   },
@@ -30,58 +30,58 @@
     "mnemonic": {
       "type": "string",
       "title": "Mnemonic (BIP-39)",
-      "description": "Phrase de 12/24 mots du wallet Sepolia. Laisser vide si vous utilisez Turnkey ci-dessous. Utilisez un mnemonic dédié testnet, jamais une seed mainnet.",
+      "description": "12/24-word phrase for the Sepolia wallet. Leave empty if you are using Turnkey below. Use a dedicated testnet mnemonic, never a mainnet seed.",
       "sensitive": true,
       "required": false
     },
     "turnkey_api_public_key": {
       "type": "string",
       "title": "Turnkey API Public Key",
-      "description": "Active le signeur distant Turnkey (prioritaire sur le mnemonic) quand renseigné.",
+      "description": "Enables the remote Turnkey signer (takes priority over the mnemonic) when set.",
       "required": false
     },
     "turnkey_api_private_key": {
       "type": "string",
       "title": "Turnkey API Private Key",
-      "description": "Clé privée de l'API key Turnkey associée à la clé publique ci-dessus.",
+      "description": "Private key of the Turnkey API key associated with the public key above.",
       "sensitive": true,
       "required": false
     },
     "turnkey_organization_id": {
       "type": "string",
       "title": "Turnkey Organization ID",
-      "description": "Organisation (ou sub-organization) Turnkey propriétaire du wallet de signature.",
+      "description": "Turnkey organization (or sub-organization) that owns the signing wallet.",
       "required": false
     },
     "turnkey_sign_with": {
       "type": "string",
       "title": "Turnkey Sign With",
-      "description": "Adresse du wallet, private key ID, ou wallet account ID à utiliser pour signer.",
+      "description": "Wallet address, private key ID, or wallet account ID to use for signing.",
       "required": false
     },
     "turnkey_api_base_url": {
       "type": "string",
       "title": "Turnkey API Base URL",
-      "description": "Optionnel, défaut: https://api.turnkey.com",
+      "description": "Optional, default: https://api.turnkey.com",
       "required": false
     },
     "rn_client_id": {
       "type": "string",
       "title": "Request Network Client ID",
-      "description": "Client ID ayant créé le Secure Payment à payer.",
+      "description": "Client ID that created the Secure Payment to be paid.",
       "sensitive": true,
       "required": true
     },
     "rn_api_base": {
       "type": "string",
       "title": "Request Network API Base",
-      "description": "Optionnel, défaut: https://api.stage.request.network",
+      "description": "Optional, default: https://api.stage.request.network",
       "required": false
     },
     "sepolia_rpc_url": {
       "type": "string",
       "title": "Sepolia RPC URL",
-      "description": "Optionnel, défaut: https://ethereum-sepolia-rpc.publicnode.com",
+      "description": "Optional, default: https://ethereum-sepolia-rpc.publicnode.com",
       "required": false
     }
   },

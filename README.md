@@ -89,6 +89,19 @@ TURNKEY_SIGN_WITH=0xYourWalletAddress
 
 Never commit `.env` or share the mnemonic / Turnkey private API key.
 
+## Install as a Claude Desktop extension (recommended for end users)
+
+Packages the server as a single `.mcpb` file. Claude Desktop shows a config form on install (mnemonic / Turnkey fields), masks and stores secrets in the OS keychain (Keychain / Credential Manager / Secret Service), and injects them into the server process only — no `.env`, no editing `mcp.json` by hand.
+
+```bash
+npm install
+npm run mcpb:pack
+```
+
+This produces `mcp-sepolia.mcpb`. Send it to the user (or distribute privately); they double-click it (or drag it into Claude Desktop, or Settings → Extensions → Advanced settings → Install Extension…) to install.
+
+See [`manifest.json`](manifest.json) for the declared config fields. `mcpb pack` respects `.gitignore`, so `.env` is never bundled — verified by packing with a dummy `.env` present and confirming it's excluded from the archive.
+
 ## Run modes
 
 ### HTTP
